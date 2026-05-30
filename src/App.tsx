@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "./App.css";
 
 type ResultStatus = "Negative" | "Positive";
@@ -233,20 +233,6 @@ function makeRowsFromLab(lab: LabName, customLabName = ""): LabRow[] {
   ];
 }
 
-function TakeCareMark({ small = false }: { small?: boolean }) {
-  return (
-    <div className={small ? "tc-mark small" : "tc-mark"}>
-      <div className="tc-blue" />
-      <div className="tc-green-right" />
-      <div className="tc-green-top" />
-      <div className="tc-line-main" />
-      <div className="tc-line-left" />
-      <div className="tc-line-right" />
-      <div className="tc-dot" />
-      <div className="tc-highlight" />
-    </div>
-  );
-}
 
 function TakeCareLogo() {
   return (
@@ -324,12 +310,7 @@ const [newAuthorizedPosition, setNewAuthorizedPosition] = useState("");
     setCustomLabName("");
   }
 
-  function updateRow(id: string, key: keyof LabRow, value: string) {
-    setRows((current) =>
-      current.map((row) => (row.id === id ? { ...row, [key]: value } : row))
-    );
-  }
-
+  
   function setResult(id: string, result: ResultStatus) {
     setRows((current) =>
       current.map((row) => (row.id === id ? { ...row, result } : row))

@@ -263,12 +263,13 @@ export default function App() {
 
   const now = useMemo(() => new Date(), []);
   const [patient, setPatient] = useState({
-    name: "",
-    dob: "",
-    nationality: "",
-    hn: "",
-    passportNo: "",
-  });
+  name: "",
+  dob: "",
+  gender: "",
+  nationality: "",
+  hn: "",
+  passportNo: "",
+});
 
   const [testInfo, setTestInfo] = useState({
     date: todayInput(now),
@@ -353,12 +354,13 @@ function refreshLabNoAndDateTime() {
 
   function clearPatientOnly() {
   setPatient({
-    name: "",
-    dob: "",
-    nationality: "",
-    hn: "",
-    passportNo: "",
-  });
+  name: "",
+  dob: "",
+  gender: "",
+  nationality: "",
+  hn: "",
+  passportNo: "",
+});
 
   setRows(makeRowsFromLab("COVID-19 antigen test"));
   setSelectedLab("COVID-19 antigen test");
@@ -376,12 +378,13 @@ function refreshLabNoAndDateTime() {
   const fresh = new Date();
 
   setPatient({
-    name: "",
-    dob: "",
-    nationality: "",
-    hn: "",
-    passportNo: "",
-  });
+  name: "",
+  dob: "",
+  gender: "",
+  nationality: "",
+  hn: "",
+  passportNo: "",
+});
 
   setTestInfo({
     date: todayInput(fresh),
@@ -487,6 +490,25 @@ function refreshLabNoAndDateTime() {
                 <input value={age} readOnly />
               </label>
             </div>
+<div className="grid-2">
+  <label>
+    Gender
+    <select
+      value={patient.gender}
+      onChange={(e) =>
+        setPatient({
+          ...patient,
+          gender: e.target.value,
+        })
+      }
+    >
+      <option value="">-- Select Gender --</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+  </label>
+</div>
 
             <div className="grid-2">
               <label>
@@ -825,6 +847,9 @@ function refreshLabNoAndDateTime() {
               <p>
                 <b>Age</b> : {age}
               </p>
+              <p>
+  <b>Gender</b> : {patient.gender || "-"}
+</p>
               <p>
                 <b>Nationality</b> : {patient.nationality || "-"}
               </p>

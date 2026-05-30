@@ -84,7 +84,10 @@ function newId() {
 }
 
 function todayInput(date: Date) {
-  return date.toISOString().slice(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 function timeInput(date: Date) {
@@ -336,46 +339,67 @@ const [newAuthorizedPosition, setNewAuthorizedPosition] = useState("");
     setNewPerformer("");
   }
 
+function refreshLabNoAndDateTime() {
+  const fresh = new Date();
+
+  setTestInfo((current) => ({
+    ...current,
+    date: todayInput(fresh),
+    time: timeInput(fresh),
+  }));
+
+  setRunningNo((current) => current + 1);
+}
+
   function clearPatientOnly() {
-    setPatient({
-      name: "",
-      dob: "",
-      nationality: "",
-      hn: "",
-      passportNo: "",
-    });
-    setRows(makeRowsFromLab("COVID-19 antigen test"));
-    setSelectedLab("COVID-19 antigen test");
-    setCustomLabName("");
+  setPatient({
+    name: "",
+    dob: "",
+    nationality: "",
+    hn: "",
+    passportNo: "",
+  });
+
+  setRows(makeRowsFromLab("COVID-19 antigen test"));
+  setSelectedLab("COVID-19 antigen test");
+  setCustomLabName("");
+
   setIsApproved(false);
-setApprovedAt("");
-setAuthorizedBy("");
-setAuthorizedPosition("");
+  setApprovedAt("");
+  setAuthorizedBy("");
+  setAuthorizedPosition("");
+
+  refreshLabNoAndDateTime();
 }
 
   function resetAll() {
-    const fresh = new Date();
-    setPatient({
-      name: "",
-      dob: "",
-      nationality: "",
-      hn: "",
-      passportNo: "",
-    });
-    setTestInfo({
-      date: todayInput(fresh),
-      time: timeInput(fresh),
-      performedBy: "",
-      note: DEFAULT_NOTE,
-    });
-    setRunningNo(1);
-    setRows(makeRowsFromLab("COVID-19 antigen test"));
-    setSelectedLab("COVID-19 antigen test");
-    setCustomLabName("");
+  const fresh = new Date();
+
+  setPatient({
+    name: "",
+    dob: "",
+    nationality: "",
+    hn: "",
+    passportNo: "",
+  });
+
+  setTestInfo({
+    date: todayInput(fresh),
+    time: timeInput(fresh),
+    performedBy: "",
+    note: DEFAULT_NOTE,
+  });
+
+  setRunningNo((current) => current + 1);
+
+  setRows(makeRowsFromLab("COVID-19 antigen test"));
+  setSelectedLab("COVID-19 antigen test");
+  setCustomLabName("");
+
   setAuthorizedBy("");
-setAuthorizedPosition("");
-setIsApproved(false);
-setApprovedAt("");
+  setAuthorizedPosition("");
+  setIsApproved(false);
+  setApprovedAt("");
 }
 
   return (

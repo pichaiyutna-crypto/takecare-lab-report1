@@ -831,33 +831,38 @@ function refreshLabNoAndDateTime() {
 
           <div className="line" />
 
-          <h1 className="report-title">LABORATORY REPORT</h1>
-
-          <div className="patient-block">
+                    <div className="patient-block">
             <div>
               <p>
                 <b>Lab No.</b> : {labNo}
               </p>
+
               <p>
                 <b>Patient Name</b> : {patient.name || "-"}
               </p>
+
               <p>
                 <b>Date of Birth</b> : {patient.dob || "-"}
               </p>
+
               <p>
                 <b>Age</b> : {age}
               </p>
+
               <p>
-  <b>Gender</b> : {patient.gender || "-"}
-</p>
+                <b>Gender</b> : {patient.gender || "-"}
+              </p>
+
               <p>
                 <b>Nationality</b> : {patient.nationality || "-"}
               </p>
             </div>
+
             <div>
               <p>
                 <b>Passport No.</b> : {patient.passportNo || "-"}
               </p>
+
               <p>
                 <b>HN</b> : {patient.hn || "-"}
               </p>

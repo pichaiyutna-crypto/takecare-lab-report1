@@ -975,3 +975,11 @@ button {
     font-size: 8.8px !important;
   }
 }
+
+.info-row {
+  display: block;
+}
+
+.info-row p {
+  margin: 8px 0;
+}

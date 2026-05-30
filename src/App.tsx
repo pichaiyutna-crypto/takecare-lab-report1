@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import "./App.css";
 
 type ResultStatus = "Negative" | "Positive";
@@ -257,6 +259,27 @@ function TakeCareStamp() {
 }
 
 export default function App() {
+  async function savePdf() {
+  const element = document.querySelector(".paper") as HTMLElement;
+
+  if (!element) return;
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const pdfWidth = 210;
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+  pdf.save(`Lab_Report_${patient.name || "Patient"}.pdf`);
+}
   const now = useMemo(() => new Date(), []);
   const [patient, setPatient] = useState({
     name: "",
@@ -390,14 +413,7 @@ setApprovedAt("");
     🖨 Print Report
   </button>
 
-<button
-  className="pdf-btn"
-  onClick={() => {
-    setTimeout(() => {
-      window.print();
-    }, 100);
-  }}
->
+<button className="pdf-btn" onClick={savePdf}>
   📄 Save PDF
 </button>
 

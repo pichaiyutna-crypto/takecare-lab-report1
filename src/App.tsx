@@ -294,6 +294,8 @@ const [customLabName, setCustomLabName] = useState("");
   const [rows, setRows] = useState<LabRow[]>(
     makeRowsFromLab("COVID-19 antigen test")
   );
+  const [dtxResult, setDtxResult] = useState("");
+const [showDtx, setShowDtx] = useState(false);
   const [performers, setPerformers] = useState(DEFAULT_PERFORMERS);
   const [newPerformer, setNewPerformer] = useState("");
   const [authorizedBy, setAuthorizedBy] = useState("");
@@ -323,12 +325,20 @@ const [newAuthorizedPosition, setNewAuthorizedPosition] = useState("");
       current.map((row) => (row.id === id ? { ...row, result } : row))
     );
   }
+function isDtxAbnormal(value: string) {
+  const numberValue = Number(value);
+
+  if (!value.trim()) return false;
+  if (Number.isNaN(numberValue)) return false;
+
+  return numberValue < 70 || numberValue > 140;
+}
+
+
 
   function removeRow(id: string) {
-    setRows((current) =>
-      current.length === 1 ? current : current.filter((row) => row.id !== id)
-    );
-  }
+  setRows((current) => current.filter((row) => row.id !== id));
+}
 
   function addPerformer() {
     const name = newPerformer.trim();
@@ -367,6 +377,8 @@ function refreshLabNoAndDateTime() {
   setRows(makeRowsFromLab("COVID-19 antigen test"));
   setSelectedLab("COVID-19 antigen test");
   setCustomLabName("");
+  setDtxResult("");
+setShowDtx(false);
 
   setIsApproved(false);
   setApprovedAt("");
@@ -400,7 +412,8 @@ function refreshLabNoAndDateTime() {
   setRows(makeRowsFromLab("COVID-19 antigen test"));
   setSelectedLab("COVID-19 antigen test");
   setCustomLabName("");
-
+setDtxResult("");
+setShowDtx(false);
   setAuthorizedBy("");
   setAuthorizedPosition("");
   setIsApproved(false);
@@ -676,7 +689,57 @@ async function savePdf() {
                 </div>
               ))}
             </div>
+            <button
+  type="button"
+  className="danger small-btn"
+  onClick={() => setRows([])}
+>
+  Clear Rapid Test
+</button>
+
+        
           </div>
+<div className="card">
+  <h2>DTX</h2>
+
+  <label>
+    Capillary blood glucose
+    <input
+      type="number"
+      value={dtxResult}
+      onChange={(e) => {
+        setDtxResult(e.target.value);
+        setShowDtx(true);
+      }}
+      placeholder="Enter DTX result"
+    />
+  </label>
+
+  <div className="button-row">
+    <button
+      type="button"
+      className="primary"
+      onClick={() => setShowDtx(true)}
+    >
+      Add DTX
+    </button>
+
+    <button
+      type="button"
+      className="danger"
+      onClick={() => {
+        setDtxResult("");
+        setShowDtx(false);
+      }}
+    >
+      Clear DTX
+    </button>
+  </div>
+
+  <p className="small-note">
+    Reference: 70-140 mg/dL
+  </p>
+</div>
 
 <div className="card">
   <h2>Test Information</h2>
@@ -837,7 +900,8 @@ async function savePdf() {
             </button>
           </div>
         </section>
-
+   
+        
         <section className="paper">
           <div className="watermark">
             <TakeCareStamp />
@@ -923,6 +987,18 @@ async function savePdf() {
                   <td>{row.method}</td>
                 </tr>
               ))}
+              {showDtx && (
+  <tr>
+    <td>DTX</td>
+    <td>Capillary blood glucose</td>
+    <td className={isDtxAbnormal(dtxResult) ? "result positive" : ""}>
+      {dtxResult || "-"}
+    </td>
+    <td>mg/dL</td>
+    <td>70-140</td>
+    <td></td>
+  </tr>
+)}
             </tbody>
           </table>
 

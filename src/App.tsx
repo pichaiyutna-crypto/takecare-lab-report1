@@ -641,7 +641,10 @@ async function savePdf() {
 
   const pdf = new jsPDF("p", "mm", "a4");
 
-  pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
+  const imgWidth = 210;
+const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
   const safeHN =
     patient.hn.trim().replace(/[\\/:*?"<>|]/g, "_") || "NoHN";

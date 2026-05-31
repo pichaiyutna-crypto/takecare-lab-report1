@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import "./App.css";
 
 type ResultStatus = "Negative" | "Positive";
@@ -404,7 +406,33 @@ function refreshLabNoAndDateTime() {
   setIsApproved(false);
   setApprovedAt("");
 }
+async function savePdf() {
+  const report = document.querySelector(".paper") as HTMLElement;
 
+  if (!report) return;
+
+  const canvas = await html2canvas(report, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
+
+  const safeHN =
+    patient.hn.trim().replace(/[\\/:*?"<>|]/g, "_") || "NoHN";
+
+  const safeName =
+    patient.name.trim().replace(/[\\/:*?"<>|]/g, "_") || "Unknown";
+
+  pdf.save(
+    `Lab report ${safeHN} ${labNo} ${safeName}.pdf`
+  );
+}
   return (
     <div className="app">
       <header className="topbar no-print">
@@ -420,11 +448,7 @@ function refreshLabNoAndDateTime() {
 
 <button
   className="pdf-btn"
-  onClick={() => {
-    setTimeout(() => {
-      window.print();
-    }, 100);
-  }}
+  onClick={savePdf}
 >
   📄 Save PDF
 </button>

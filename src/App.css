@@ -983,3 +983,21 @@ button {
 .info-row p {
   margin: 8px 0;
 }
+
+.abnormal-input {
+  color: #b91c1c;
+  font-weight: 700;
+  border-color: #b91c1c;
+}
+
+.note-input-section {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.note-input-section textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.45;
+}

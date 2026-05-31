@@ -15,7 +15,8 @@ type LabRow = {
   method: string;
   refLow?: number;
   refHigh?: number;
-  inputType?: "rapid" | "numeric";
+  inputType?: "rapid" | "numeric" | "urine";
+  options?: string[];
 };
 
 type LabName =
@@ -34,7 +35,8 @@ type LabName =
   | "CBC"
   | "DTX"
   | "Blood Electrolyte"
-  | "Blood chemistry";
+  | "Blood chemistry"
+  | "Urine examination";
 
 
 
@@ -138,6 +140,92 @@ const BLOOD_CHEMISTRY_ITEMS = [
   { item: "Blood Urea Nitrogen (BUN)", unit: "mmol/L", refLow: 2.5, refHigh: 8.2 },
   { item: "Glucose (GLU)", unit: "mg/dL", refLow: 70, refHigh: 110 },
 ];
+const URINE_EXAM_ITEMS = [
+  {
+    item: "Urobilinogen",
+    unit: "",
+    reference: "Normal",
+    options: ["Normal", "1+", "2+", "3+"],
+  },
+  {
+    item: "Bilirubin",
+    unit: "",
+    reference: "Negative",
+    options: ["Negative", "1+", "2+", "3+"],
+  },
+  {
+    item: "Ketone",
+    unit: "",
+    reference: "Negative",
+    options: ["Negative", "Trace", "1+", "2+", "3+", "4+"],
+  },
+  {
+    item: "Creatinine",
+    unit: "",
+    reference: "",
+    options: ["0.9", "1.8", "2.7"],
+  },
+  {
+    item: "Blood",
+    unit: "",
+    reference: "Negative",
+    options: ["Negative", "Trace", "1+", "2+", "3+", "4+"],
+  },
+  {
+    item: "Protein",
+    unit: "",
+    reference: "Negative",
+    options: ["Negative", "Trace", "1+", "2+", "3+", "4+"],
+  },
+  {
+    item: "Micro Albumin",
+    unit: "",
+    reference: "<10",
+    options: ["10", "30", "80", "150"],
+  },
+  {
+    item: "Nitrite",
+    unit: "",
+    reference: "Negative",
+    options: ["Negative", "Positive"],
+  },
+  {
+    item: "Leukocytes",
+    unit: "",
+    reference: "Negative",
+    options: ["Negative", "Trace", "1+", "2+", "3+", "4+"],
+  },
+  {
+    item: "Glucose",
+    unit: "",
+    reference: "Negative",
+    options: ["Negative", "Trace", "1+", "2+", "3+", "4+"],
+  },
+  {
+    item: "Specific Gravity",
+    unit: "",
+    reference: "1.000-1.030",
+    options: ["1.000", "1.005", "1.010", "1.015", "1.020", "1.025", "1.030"],
+  },
+  {
+    item: "pH",
+    unit: "",
+    reference: "5.0-8.5",
+    options: ["5.0", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5"],
+  },
+  {
+    item: "Ascorbate",
+    unit: "",
+    reference: "0",
+    options: ["0", "1+", "2+", "3+"],
+  },
+  {
+    item: "Calcium",
+    unit: "",
+    reference: "≤1.0",
+    options: ["≤1.0", "2.5", "5.0", "7.5", "10"],
+  },
+];
 
 function makeCbcRows(): LabRow[] {
   return CBC_ITEMS.map((test) => ({
@@ -181,7 +269,19 @@ function makeBloodChemistryRows(): LabRow[] {
     inputType: "numeric",
   }));
 }
-
+function makeUrineExamRows(): LabRow[] {
+  return URINE_EXAM_ITEMS.map((test) => ({
+    id: newId(),
+    labGroup: "Urine examination",
+    item: test.item,
+    result: "",
+    unit: test.unit,
+    reference: test.reference,
+    method: "Dipstick",
+    inputType: "urine",
+    options: test.options,
+  }));
+}
 const DEFAULT_NOTE =
   "This report is issued based on the sample tested at the date and time stated above. Clinical correlation is recommended. If symptoms persist or worsen, please consult a physician.";
 
@@ -474,12 +574,24 @@ function addNumericLab() {
   ]);
   return;
 }
+if (selectedNumericLab === "Urine examination") {
+  setRows((current) => [
+    ...current,
+    ...makeUrineExamRows(),
+  ]);
+  return;
+}
 }
 
 function clearNumericLab() {
   setRows((current) =>
-    current.filter((row) => row.inputType !== "numeric")
+    current.filter(
+      (row) =>
+        row.inputType !== "numeric" &&
+        row.inputType !== "urine"
+    )
   );
+
   setDtxResult("");
   setShowDtx(false);
 }
@@ -522,6 +634,10 @@ function displayResult(row: LabRow) {
 }
 
 function resultClassName(row: LabRow) {
+  if (row.inputType === "urine") {
+    return isUrineAbnormal(row) ? "result positive" : "";
+  }
+
   if (row.inputType === "numeric") {
     return getNumericFlag(row) ? "result positive" : "";
   }
@@ -539,6 +655,24 @@ function isDtxAbnormal(value: string) {
   if (Number.isNaN(numberValue)) return false;
 
   return numberValue < 70 || numberValue > 140;
+}
+function isUrineAbnormal(row: LabRow) {
+  if (row.inputType !== "urine") return false;
+  if (!row.result.trim()) return false;
+
+  if (row.item === "pH") {
+    const value = Number(row.result);
+    return value < 5.0 || value > 8.5;
+  }
+
+  if (row.item === "Specific Gravity") {
+    const value = Number(row.result);
+    return value < 1.0 || value > 1.03;
+  }
+
+  const normalValues = ["Negative", "Normal", "0", "≤1.0"];
+
+  return !normalValues.includes(row.result);
 }
 
 
@@ -639,12 +773,69 @@ async function savePdf() {
 
   const imgData = canvas.toDataURL("image/png");
 
-  const pdf = new jsPDF("p", "mm", "a4");
+const pdf = new jsPDF("p", "mm", "a4");
 
-  const imgWidth = 210;
-const imgHeight = (canvas.height * imgWidth) / canvas.width;
+const pageWidth = 210;
+const pageHeight = 297;
+const margin = 10;
 
-pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+const usableWidth = pageWidth - margin * 2;
+const usableHeight = pageHeight - margin * 2;
+
+const pageCanvasHeight = Math.floor(
+  (usableHeight * canvas.width) / usableWidth
+);
+
+let renderedHeight = 0;
+let pageIndex = 0;
+
+while (renderedHeight < canvas.height) {
+  const sliceHeight = Math.min(
+    pageCanvasHeight,
+    canvas.height - renderedHeight
+  );
+
+  // ถ้าเหลือเศษน้อยมาก ไม่ต้องสร้างหน้าใหม่
+  if (sliceHeight < 80) break;
+
+  const pageCanvas = document.createElement("canvas");
+  pageCanvas.width = canvas.width;
+  pageCanvas.height = sliceHeight;
+
+  const ctx = pageCanvas.getContext("2d");
+  if (!ctx) break;
+
+  ctx.drawImage(
+    canvas,
+    0,
+    renderedHeight,
+    canvas.width,
+    sliceHeight,
+    0,
+    0,
+    canvas.width,
+    sliceHeight
+  );
+
+  const pageImgData = pageCanvas.toDataURL("image/png");
+  const pageImgHeight = (sliceHeight * usableWidth) / canvas.width;
+
+  if (pageIndex > 0) {
+    pdf.addPage();
+  }
+
+  pdf.addImage(
+    pageImgData,
+    "PNG",
+    margin,
+    margin,
+    usableWidth,
+    pageImgHeight
+  );
+
+  renderedHeight += sliceHeight;
+  pageIndex += 1;
+}
 
   const safeHN =
     patient.hn.trim().replace(/[\\/:*?"<>|]/g, "_") || "NoHN";
@@ -865,7 +1056,7 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
             <div className="mini-table">
               {rows
-  .filter((row) => row.inputType !== "numeric")
+  .filter((row) => row.inputType !== "numeric" && row.inputType !== "urine")
   .map((row) => (
                 <div className="mini-row" key={row.id}>
                   <div>
@@ -949,6 +1140,10 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 <option value="Blood chemistry">
   Blood chemistry
 </option>
+
+<option value="Urine examination">
+  Urine examination
+</option>
     </select>
 
     <button
@@ -962,7 +1157,7 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
   <div className="mini-table">
     {rows
-      .filter((row) => row.inputType === "numeric")
+      .filter((row) => row.inputType === "numeric" || row.inputType === "urine")
       .map((row) => (
         <div className="mini-row" key={row.id}>
           <div>
@@ -972,15 +1167,28 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
           </div>
 
           <div className="mini-actions">
-            <input
-              type="number"
-              value={row.result}
-              onChange={(e) =>
-                setNumericResult(row.id, e.target.value)
-              }
-              placeholder="Result"
-              className={getNumericFlag(row) ? "abnormal-input" : ""}
-            />
+            {row.inputType === "urine" ? (
+  <select
+  value={row.result}
+  onChange={(e) => setNumericResult(row.id, e.target.value)}
+  className={isUrineAbnormal(row) ? "abnormal-input" : ""}
+>
+    <option value="">-- Select --</option>
+    {row.options?.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ))}
+  </select>
+) : (
+  <input
+    type="number"
+    value={row.result}
+    onChange={(e) => setNumericResult(row.id, e.target.value)}
+    placeholder="Result"
+    className={getNumericFlag(row) ? "abnormal-input" : ""}
+  />
+)}
 
             <button
               className="delete"
@@ -1088,7 +1296,20 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
   </div>
 
   <hr className="section-divider" />
-
+  <label>
+  Additional note
+  <textarea
+    rows={5}
+    value={testInfo.note}
+    onChange={(e) =>
+      setTestInfo({
+        ...testInfo,
+        note: e.target.value,
+      })
+    }
+    placeholder="Example: Hemolysis noted. Please interpret potassium result with caution."
+  />
+</label>
   <label>
     Authorized by
     <select
@@ -1118,6 +1339,7 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
     Position
     <input value={authorizedPosition} readOnly />
   </label>
+
   <div className="row">
   <input
     value={newAuthorizedName}
@@ -1154,6 +1376,7 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
   >
     Add
   </button>
+ 
 </div>
 
   <button
@@ -1322,12 +1545,13 @@ pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
           </div>
 
           <div className="bottom">
-            <p className="note">{testInfo.note}</p>
-            <div className="qr-box">
-              <b>QR / Clinic Stamp</b>
-              <TakeCareStamp />
-            </div>
-          </div>
+  <div className="note">
+  <b>Laboratory Note</b>
+  <br />
+  <br />
+  {testInfo.note}
+</div>
+</div>
 
           <div className="end-report">*** End of Report ***</div>
         </section>

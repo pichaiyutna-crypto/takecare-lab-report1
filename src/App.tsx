@@ -9,10 +9,13 @@ type LabRow = {
   id: string;
   labGroup: string;
   item: string;
-  result: ResultStatus;
+  result: string;
   unit: string;
   reference: string;
   method: string;
+  refLow?: number;
+  refHigh?: number;
+  inputType?: "rapid" | "numeric";
 };
 
 type LabName =
@@ -26,6 +29,12 @@ type LabName =
   | "Chlamydia test"
   | "Gonorrhea test"
   | "Other";
+
+  type NumericLabName =
+  | "CBC"
+  | "DTX"
+  | "Blood Electrolyte"
+  | "Blood chemistry";
 
 
 
@@ -53,7 +62,125 @@ const DEFAULT_LAB_OPTIONS = [
   "Scrub typhus test",
   "Other",
 ];
+const CBC_ITEMS = [
+  { item: "White blood cell(WBC)", unit: "10^9/L", refLow: 4, refHigh: 10 },
+  { item: "Lymphocyte%(Lym%)", unit: "%", refLow: 20, refHigh: 40 },
+  { item: "Granulocyte%(GR%)", unit: "%", refLow: 50, refHigh: 75 },
+  { item: "Lym#", unit: "10^9/L", refLow: 0.8, refHigh: 4.5 },
+  { item: "GR#", unit: "10^9/L", refLow: 1.8, refHigh: 6.3 },
+  { item: "Red blood cell(RBC)", unit: "10^12/L", refLow: 3.5, refHigh: 5.5 },
+  { item: "Hemoglobin(Hb)", unit: "g/L", refLow: 110, refHigh: 160 },
+  { item: "Hematocrit(Hct)", unit: "%", refLow: 37, refHigh: 49 },
+  { item: "MCV", unit: "fL", refLow: 80, refHigh: 100 },
+  { item: "MCH", unit: "pg", refLow: 27, refHigh: 34 },
+  { item: "MCHC", unit: "g/L", refLow: 320, refHigh: 360 },
+  { item: "RDW_CV", unit: "%", refLow: 0, refHigh: 16 },
+  { item: "RDW_SD", unit: "fL", refLow: 37, refHigh: 55 },
+  { item: "Platelet(PLT)", unit: "10^9/L", refLow: 100, refHigh: 300 },
+];
+const ELECTROLYTE_ITEMS = [
+  {
+    item: "tCO2",
+    unit: "mmol/L",
+    refLow: 22,
+    refHigh: 29,
+  },
+  {
+    item: "Ca",
+    unit: "mmol/L",
+    refLow: 2.00,
+    refHigh: 2.58,
+  },
+  {
+    item: "PHOS",
+    unit: "mmol/L",
+    refLow: 0.85,
+    refHigh: 1.50,
+  },
+  {
+    item: "Mg",
+    unit: "mmol/L",
+    refLow: 0.65,
+    refHigh: 1.10,
+  },
+  {
+    item: "K+",
+    unit: "mmol/L",
+    refLow: 3.4,
+    refHigh: 5.1,
+  },
+  {
+    item: "Na+",
+    unit: "mmol/L",
+    refLow: 135,
+    refHigh: 145,
+  },
+  {
+    item: "Cl-",
+    unit: "mmol/L",
+    refLow: 99,
+    refHigh: 110,
+  },
+];
+const BLOOD_CHEMISTRY_ITEMS = [
+  { item: "Albumin (ALB)", unit: "g/dL", refLow: 3.3, refHigh: 5.5 },
+  { item: "Total Protein (TP)", unit: "g/dL", refLow: 6.4, refHigh: 8.5 },
+  { item: "Globulin (GLOB)", unit: "g/dL", refLow: 2.0, refHigh: 4.0 },
+  { item: "A/G Ratio (A/G)", unit: "", refLow: 1.2, refHigh: 2.4 },
+  { item: "Total Bilirubin (TB)", unit: "mg/dL", refLow: 0.2, refHigh: 1.2 },
+  { item: "Gamma GT (GGT)", unit: "U/L", refLow: 11, refHigh: 50 },
+  { item: "AST (SGOT)", unit: "U/L", refLow: 15, refHigh: 40 },
+  { item: "ALT (SGPT)", unit: "U/L", refLow: 9, refHigh: 50 },
+  { item: "Alkaline Phosphatase (ALP)", unit: "U/L", refLow: 40, refHigh: 150 },
+  { item: "Amylase (AMY)", unit: "U/L", refLow: 20, refHigh: 110 },
+  { item: "Creatinine (CRE)", unit: "mg/dL", refLow: 0.5, refHigh: 1.1 },
+  { item: "Uric Acid (UA)", unit: "mg/dL", refLow: 3.49, refHigh: 7.19 },
+  { item: "Blood Urea Nitrogen (BUN)", unit: "mmol/L", refLow: 2.5, refHigh: 8.2 },
+  { item: "Glucose (GLU)", unit: "mg/dL", refLow: 70, refHigh: 110 },
+];
 
+function makeCbcRows(): LabRow[] {
+  return CBC_ITEMS.map((test) => ({
+    id: newId(),
+    labGroup: "CBC",
+    item: test.item,
+    result: "",
+    unit: test.unit,
+    reference: `${test.refLow}-${test.refHigh}`,
+    method: "",
+    refLow: test.refLow,
+    refHigh: test.refHigh,
+    inputType: "numeric",
+  }));
+}
+function makeElectrolyteRows(): LabRow[] {
+  return ELECTROLYTE_ITEMS.map((test) => ({
+    id: newId(),
+    labGroup: "Blood Electrolyte",
+    item: test.item,
+    result: "",
+    unit: test.unit,
+    reference: `${test.refLow}-${test.refHigh}`,
+    method: "",
+    refLow: test.refLow,
+    refHigh: test.refHigh,
+    inputType: "numeric",
+  }));
+}
+function makeBloodChemistryRows(): LabRow[] {
+  return BLOOD_CHEMISTRY_ITEMS.map((test) => ({
+    id: newId(),
+    labGroup: "Blood chemistry",
+    item: test.item,
+    result: "",
+    unit: test.unit,
+    reference: `${test.refLow}-${test.refHigh}`,
+    method: "",
+    refLow: test.refLow,
+    refHigh: test.refHigh,
+    inputType: "numeric",
+  }));
+}
 
 const DEFAULT_NOTE =
   "This report is issued based on the sample tested at the date and time stated above. Clinical correlation is recommended. If symptoms persist or worsen, please consult a physician.";
@@ -216,6 +343,7 @@ function makeRowsFromLab(lab: LabName, customLabName = ""): LabRow[] {
     ];
   }
 
+
   if (lab === "Other") {
     const name = customLabName.trim() || "Other rapid test";
     return [
@@ -294,7 +422,10 @@ const [customLabName, setCustomLabName] = useState("");
   const [rows, setRows] = useState<LabRow[]>(
     makeRowsFromLab("COVID-19 antigen test")
   );
-  const [dtxResult, setDtxResult] = useState("");
+  const [selectedNumericLab, setSelectedNumericLab] =
+  useState<NumericLabName>("CBC");
+
+const [dtxResult, setDtxResult] = useState("");
 const [showDtx, setShowDtx] = useState(false);
   const [performers, setPerformers] = useState(DEFAULT_PERFORMERS);
   const [newPerformer, setNewPerformer] = useState("");
@@ -318,13 +449,89 @@ const [newAuthorizedPosition, setNewAuthorizedPosition] = useState("");
     ]);
     setCustomLabName("");
   }
+function addNumericLab() {
+  if (selectedNumericLab === "CBC") {
+    setRows((current) => [...current, ...makeCbcRows()]);
+    return;
+  }
 
+  if (selectedNumericLab === "DTX") {
+    setShowDtx(true);
+    return;
+  }
+
+  if (selectedNumericLab === "Blood Electrolyte") {
+    setRows((current) => [
+      ...current,
+      ...makeElectrolyteRows(),
+    ]);
+    return;
+  }
+  if (selectedNumericLab === "Blood chemistry") {
+  setRows((current) => [
+    ...current,
+    ...makeBloodChemistryRows(),
+  ]);
+  return;
+}
+}
+
+function clearNumericLab() {
+  setRows((current) =>
+    current.filter((row) => row.inputType !== "numeric")
+  );
+  setDtxResult("");
+  setShowDtx(false);
+}
   
   function setResult(id: string, result: ResultStatus) {
     setRows((current) =>
       current.map((row) => (row.id === id ? { ...row, result } : row))
     );
   }
+  function setNumericResult(id: string, value: string) {
+  setRows((current) =>
+    current.map((row) =>
+      row.id === id ? { ...row, result: value } : row
+    )
+  );
+}
+
+function getNumericFlag(row: LabRow) {
+  if (row.inputType !== "numeric") return "";
+
+  const value = Number(row.result);
+
+  if (!row.result.trim()) return "";
+  if (Number.isNaN(value)) return "";
+  if (row.refLow === undefined || row.refHigh === undefined) return "";
+
+  if (value < row.refLow) return "L";
+  if (value > row.refHigh) return "H";
+
+  return "";
+}
+
+function displayResult(row: LabRow) {
+  const flag = getNumericFlag(row);
+
+  if (!row.result.trim()) return "-";
+  if (!flag) return row.result;
+
+  return `${row.result} (${flag})`;
+}
+
+function resultClassName(row: LabRow) {
+  if (row.inputType === "numeric") {
+    return getNumericFlag(row) ? "result positive" : "";
+  }
+
+  if (row.result === "Positive") return "result positive";
+  if (row.result === "Negative") return "result negative";
+
+  return "";
+}
+
 function isDtxAbnormal(value: string) {
   const numberValue = Number(value);
 
@@ -654,7 +861,9 @@ async function savePdf() {
             )}
 
             <div className="mini-table">
-              {rows.map((row) => (
+              {rows
+  .filter((row) => row.inputType !== "numeric")
+  .map((row) => (
                 <div className="mini-row" key={row.id}>
                   <div>
                     <b>{row.labGroup}</b>
@@ -662,37 +871,57 @@ async function savePdf() {
                     <span>{row.item}</span>
                   </div>
                   <div className="mini-actions">
-                    <button
-                      className={
-                        row.result === "Negative"
-                          ? "mini-neg active"
-                          : "mini-neg"
-                      }
-                      onClick={() => setResult(row.id, "Negative")}
-                    >
-                      Negative
-                    </button>
-                    <button
-                      className={
-                        row.result === "Positive"
-                          ? "mini-pos active"
-                          : "mini-pos"
-                      }
-                      onClick={() => setResult(row.id, "Positive")}
-                    >
-                      Positive
-                    </button>
-                    <button className="delete" onClick={() => removeRow(row.id)}>
-                      ×
-                    </button>
-                  </div>
+  {row.inputType === "numeric" ? (
+    <input
+      type="number"
+      value={row.result}
+      onChange={(e) => setNumericResult(row.id, e.target.value)}
+      placeholder="Result"
+      className={getNumericFlag(row) ? "abnormal-input" : ""}
+    />
+  ) : (
+    <>
+      <button
+        className={
+          row.result === "Negative"
+            ? "mini-neg active"
+            : "mini-neg"
+        }
+        onClick={() => setResult(row.id, "Negative")}
+      >
+        Negative
+      </button>
+
+      <button
+        className={
+          row.result === "Positive"
+            ? "mini-pos active"
+            : "mini-pos"
+        }
+        onClick={() => setResult(row.id, "Positive")}
+      >
+        Positive
+      </button>
+    </>
+  )}
+
+  <button className="delete" onClick={() => removeRow(row.id)}>
+    ×
+  </button>
+</div>
+
                 </div>
               ))}
             </div>
             <button
   type="button"
   className="danger small-btn"
-  onClick={() => setRows([])}
+  onClick={() =>
+  setRows((current) =>
+    current.filter((row) => row.inputType === "numeric")
+  )
+}
+
 >
   Clear Rapid Test
 </button>
@@ -700,45 +929,95 @@ async function savePdf() {
         
           </div>
 <div className="card">
-  <h2>DTX</h2>
+  <h2>Numeric Lab</h2>
 
-  <label>
-    Capillary blood glucose
-    <input
-      type="number"
-      value={dtxResult}
-      onChange={(e) => {
-        setDtxResult(e.target.value);
-        setShowDtx(true);
-      }}
-      placeholder="Enter DTX result"
-    />
-  </label>
-
-  <div className="button-row">
-    <button
-      type="button"
-      className="primary"
-      onClick={() => setShowDtx(true)}
+  <div className="row">
+    <select
+      value={selectedNumericLab}
+      onChange={(e) =>
+        setSelectedNumericLab(e.target.value as NumericLabName)
+      }
     >
-      Add DTX
-    </button>
+      <option value="CBC">CBC</option>
+      <option value="DTX">DTX</option>
+      <option value="Blood Electrolyte">
+  Blood Electrolyte
+</option>
+<option value="Blood chemistry">
+  Blood chemistry
+</option>
+    </select>
 
     <button
       type="button"
-      className="danger"
-      onClick={() => {
-        setDtxResult("");
-        setShowDtx(false);
-      }}
+      className="primary small-btn"
+      onClick={addNumericLab}
     >
-      Clear DTX
+      Add
     </button>
   </div>
 
-  <p className="small-note">
-    Reference: 70-140 mg/dL
-  </p>
+  <div className="mini-table">
+    {rows
+      .filter((row) => row.inputType === "numeric")
+      .map((row) => (
+        <div className="mini-row" key={row.id}>
+          <div>
+            <b>{row.labGroup}</b>
+            <br />
+            <span>{row.item}</span>
+          </div>
+
+          <div className="mini-actions">
+            <input
+              type="number"
+              value={row.result}
+              onChange={(e) =>
+                setNumericResult(row.id, e.target.value)
+              }
+              placeholder="Result"
+              className={getNumericFlag(row) ? "abnormal-input" : ""}
+            />
+
+            <button
+              className="delete"
+              onClick={() => removeRow(row.id)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      ))}
+  </div>
+
+  {showDtx && (
+    <>
+      <hr className="section-divider" />
+
+      <label>
+        Capillary blood glucose
+        <input
+          type="number"
+          value={dtxResult}
+          onChange={(e) => setDtxResult(e.target.value)}
+          placeholder="Enter DTX result"
+          className={isDtxAbnormal(dtxResult) ? "abnormal-input" : ""}
+        />
+      </label>
+
+      <p className="small-note">
+        DTX Reference: 70-140 mg/dL
+      </p>
+    </>
+  )}
+
+  <button
+    type="button"
+    className="danger small-btn"
+    onClick={clearNumericLab}
+  >
+    Clear Numeric Lab
+  </button>
 </div>
 
 <div className="card">
@@ -973,15 +1252,10 @@ async function savePdf() {
                 <tr key={row.id}>
                   <td>{row.labGroup}</td>
                   <td>{row.item}</td>
-                  <td
-                    className={
-                      row.result === "Positive"
-                        ? "result positive"
-                        : "result negative"
-                    }
-                  >
-                    {row.result}
-                  </td>
+                  <td className={resultClassName(row)}>
+  {displayResult(row)}
+</td>
+
                   <td>{row.unit}</td>
                   <td>{row.reference}</td>
                   <td>{row.method}</td>

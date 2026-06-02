@@ -1001,3 +1001,17 @@ button {
   resize: vertical;
   line-height: 1.45;
 }
+
+.line-btn {
+  background-color: #06C755;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.line-btn:hover {
+  opacity: 0.9;
+}

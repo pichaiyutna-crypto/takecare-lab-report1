@@ -20,65 +20,66 @@ type LabRow = {
 };
 
 type LabName =
-  | "COVID-19 antigen test"
-  | "Influenza test"
-  | "Dengue test"
+  | "COVID-19 Antigen Test"
+  | "Influenza Test"
+  | "Dengue Test"
   | "Anti-HIV"
   | "HBsAg"
   | "Anti-HCV"
-  | "Syphilis test"
-  | "Chlamydia test"
-  | "Gonorrhea test"
+  | "Syphilis Test"
+  | "Chlamydia Test"
+  | "Gonorrhea Test"
   | "Other";
 
   type NumericLabName =
   | "CBC"
   | "DTX"
   | "Blood Electrolyte"
-  | "Blood chemistry"
-  | "Urine examination";
+  | "Blood Chemistry"
+  | "Urine Examination";
 
 
 
 const DEFAULT_LAB_OPTIONS = [
-  "COVID-19 antigen test",
-  "Influenza test",
-  "Dengue test",
+  "COVID-19 Antigen Test",
+  "Influenza Test",
+  "Dengue Test",
   "Anti-HIV",
   "HBsAg",
   "Anti-HCV",
-  "Syphilis test",
-  "Chlamydia test",
-  "Gonorrhea test",
-  "Streptococcus A throat swab",
-  "Urine pregnancy test",
-  "Urine ketone test",
-  "FOB stool occult blood",
-  "RSV rapid test",
-  "Parainfluenza rapid test (PIV)",
-  "Adenovirus rapid test (ADV)",
-  "Mycoplasma rapid test (MP)",
-  "H. pylori stool antigen",
-  "Rotavirus stool antigen",
-  "Malaria rapid test",
-  "Scrub typhus test",
+  "Syphilis Test",
+  "Chlamydia Test",
+  "Gonorrhea Test",
+  "Streptococcus A Throat Swab",
+  "Urine Pregnancy Test",
+  "Urine Ketone Test",
+  "FOB Stool Occult Blood",
+  "RSV Rapid Test",
+  "Parainfluenza Rapid Test (PIV)",
+  "Adenovirus Rapid Test (ADV)",
+  "Mycoplasma Rapid Test (MP)",
+  "H. pylori Stool Antigen",
+  "Rotavirus Stool Antigen",
+  "Malaria Rapid Test",
+  "Scrub Typhus Test",
   "Other",
 ];
+
 const CBC_ITEMS = [
-  { item: "White blood cell(WBC)", unit: "10^9/L", refLow: 4, refHigh: 10 },
-  { item: "Lymphocyte%(Lym%)", unit: "%", refLow: 20, refHigh: 40 },
-  { item: "Granulocyte%(GR%)", unit: "%", refLow: 50, refHigh: 75 },
+  { item: "White Blood Cell (WBC)", unit: "10^9/L", refLow: 4, refHigh: 10 },
+  { item: "Lymphocyte % (Lym%)", unit: "%", refLow: 20, refHigh: 40 },
+  { item: "Granulocyte % (GR%)", unit: "%", refLow: 50, refHigh: 75 },
   { item: "Lym#", unit: "10^9/L", refLow: 0.8, refHigh: 4.5 },
   { item: "GR#", unit: "10^9/L", refLow: 1.8, refHigh: 6.3 },
-  { item: "Red blood cell(RBC)", unit: "10^12/L", refLow: 3.5, refHigh: 5.5 },
-  { item: "Hemoglobin(Hb)", unit: "g/L", refLow: 110, refHigh: 160 },
-  { item: "Hematocrit(Hct)", unit: "%", refLow: 37, refHigh: 49 },
+  { item: "Red Blood Cell (RBC)", unit: "10^12/L", refLow: 3.5, refHigh: 5.5 },
+  { item: "Hemoglobin (Hb)", unit: "g/L", refLow: 110, refHigh: 160 },
+  { item: "Hematocrit (Hct)", unit: "%", refLow: 37, refHigh: 49 },
   { item: "MCV", unit: "fL", refLow: 80, refHigh: 100 },
   { item: "MCH", unit: "pg", refLow: 27, refHigh: 34 },
   { item: "MCHC", unit: "g/L", refLow: 320, refHigh: 360 },
-  { item: "RDW_CV", unit: "%", refLow: 0, refHigh: 16 },
-  { item: "RDW_SD", unit: "fL", refLow: 37, refHigh: 55 },
-  { item: "Platelet(PLT)", unit: "10^9/L", refLow: 100, refHigh: 300 },
+  { item: "RDW-CV", unit: "%", refLow: 0, refHigh: 16 },
+  { item: "RDW-SD", unit: "fL", refLow: 37, refHigh: 55 },
+  { item: "Platelet (PLT)", unit: "10^9/L", refLow: 100, refHigh: 300 },
 ];
 const ELECTROLYTE_ITEMS = [
   {
@@ -178,7 +179,7 @@ const URINE_EXAM_ITEMS = [
     options: ["Negative", "Trace", "1+", "2+", "3+", "4+"],
   },
   {
-    item: "Micro Albumin",
+    item: "Microalbumin",
     unit: "",
     reference: "<10",
     options: ["10", "30", "80", "150"],
@@ -214,7 +215,7 @@ const URINE_EXAM_ITEMS = [
     options: ["5.0", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5"],
   },
   {
-    item: "Ascorbate",
+    item: "Ascorbic Acid",
     unit: "",
     reference: "0",
     options: ["0", "1+", "2+", "3+"],
@@ -258,7 +259,7 @@ function makeElectrolyteRows(): LabRow[] {
 function makeBloodChemistryRows(): LabRow[] {
   return BLOOD_CHEMISTRY_ITEMS.map((test) => ({
     id: newId(),
-    labGroup: "Blood chemistry",
+    labGroup: "Blood Chemistry",
     item: test.item,
     result: "",
     unit: test.unit,
@@ -272,7 +273,7 @@ function makeBloodChemistryRows(): LabRow[] {
 function makeUrineExamRows(): LabRow[] {
   return URINE_EXAM_ITEMS.map((test) => ({
     id: newId(),
-    labGroup: "Urine examination",
+    labGroup: "Urine Examination",
     item: test.item,
     result: "",
     unit: test.unit,
@@ -284,18 +285,44 @@ function makeUrineExamRows(): LabRow[] {
 }
 const DEFAULT_NOTE =
   "This report is issued based on the sample tested at the date and time stated above. Clinical correlation is recommended. If symptoms persist or worsen, please consult a physician.";
+const NOTE_TEMPLATES = [
+  {
+    label: "Default report note",
+    text: DEFAULT_NOTE,
+  },
+  {
+    label: "Hemolysis caution",
+    text: "Hemolysis was observed. Please interpret affected laboratory results with caution.",
+  },
+  {
+    label: "Lipemic sample caution",
+    text: "Lipemic sample was observed. Please interpret affected laboratory results with caution.",
+  },
+  {
+    label: "Insufficient sample",
+    text: "The sample volume was insufficient for complete analysis. Repeat sample collection is recommended if clinically indicated.",
+  },
+  {
+    label: "Clinical correlation advised",
+    text: "Clinical correlation is advised. Please interpret the results together with the patient's symptoms, physical examination, and clinical history.",
+  },
+  {
+    label: "Repeat test if symptoms persist",
+    text: "If symptoms persist or worsen, repeat testing or further investigation is recommended.",
+  },
+];
 
 const DEFAULT_PERFORMERS = [
   "Dr. Pichaiyut Naktongkul",
   "Nurse",
   "Medical assistant",
   "Lab technician",
-  "Paramidics"
+  "Paramedics"
 ];
 
 const DEFAULT_AUTHORIZED_PERSONS = [
   {
-    name: "Dr. Pichaiyut Nakthongkul",
+    name: "Dr. Pichaiyut Naktongkul",
     position: "Physician",
   },
   {
@@ -331,8 +358,20 @@ function dateCompact(dateText: string) {
   return `${y}${m}${d}`;
 }
 
-function generateLabNo(dateText: string, running: number) {
-  return `TKC-${dateCompact(dateText)}-${String(running).padStart(3, "0")}`;
+function getDeviceCode() {
+  const saved = localStorage.getItem("deviceCode");
+
+  if (saved) return saved;
+
+  const code = Math.random().toString(36).substring(2, 5).toUpperCase();
+
+  localStorage.setItem("deviceCode", code);
+
+  return code;
+}
+
+function generateLabNo(dateText: string, running: number, deviceCode: string) {
+  return `TKC-${dateCompact(dateText)}-${deviceCode}-${String(running).padStart(3, "0")}`;
 }
 
 function calculateAge(dob: string, refDateText: string) {
@@ -367,22 +406,22 @@ function makeRowsFromLab(lab: LabName, customLabName = ""): LabRow[] {
     method: "Rapid Test",
   };
 
-  if (lab === "COVID-19 antigen test") {
+  if (lab === "COVID-19 Antigen Test") {
     return [
       {
         id: newId(),
-        labGroup: "COVID-19 antigen test",
+        labGroup: "COVID-19 Antigen Test",
         item: "COVID-19 Antigen",
         ...base,
       },
     ];
   }
 
-  if (lab === "Influenza test") {
+  if (lab === "Influenza Test") {
     return [
       {
         id: newId(),
-        labGroup: "Influenza test",
+        labGroup: "Influenza Test",
         item: "Influenza A",
         ...base,
       },
@@ -395,42 +434,42 @@ function makeRowsFromLab(lab: LabName, customLabName = ""): LabRow[] {
     ];
   }
 
-  if (lab === "Dengue test") {
+  if (lab === "Dengue Test") {
     return [
       {
         id: newId(),
-        labGroup: "Dengue test",
+        labGroup: "Dengue Test",
         item: "Dengue NS1",
         ...base,
       },
       {
         id: newId(),
-        labGroup: "Dengue test",
+        labGroup: "Dengue Test",
         item: "Dengue IgM",
         ...base,
       },
       {
         id: newId(),
-        labGroup: "Dengue test",
+        labGroup: "Dengue Test",
         item: "Dengue IgG",
         ...base,
       },
     ];
   }
   const customPresetLabs = [
-    "Streptococcus A throat swab",
-    "Urine pregnancy test",
-    "Urine ketone test",
-    "FOB stool occult blood",
-    "RSV rapid test",
-    "Parainfluenza rapid test (PIV)",
-    "Adenovirus rapid test (ADV)",
-    "Mycoplasma rapid test (MP)",
-    "H. pylori stool antigen",
-    "Rotavirus stool antigen",
-    "Malaria rapid test",
-    "Scrub typhus test",
-  ];
+  "Streptococcus A Throat Swab",
+  "Urine Pregnancy Test",
+  "Urine Ketone Test",
+  "FOB Stool Occult Blood",
+  "RSV Rapid Test",
+  "Parainfluenza Rapid Test (PIV)",
+  "Adenovirus Rapid Test (ADV)",
+  "Mycoplasma Rapid Test (MP)",
+  "H. pylori Stool Antigen",
+  "Rotavirus Stool Antigen",
+  "Malaria Rapid Test",
+  "Scrub Typhus Test",
+];
 
   if (customPresetLabs.includes(lab)) {
     return [
@@ -492,6 +531,7 @@ function TakeCareStamp() {
 export default function App() {
 
   const now = useMemo(() => new Date(), []);
+  const [deviceCode] = useState(() => getDeviceCode());
   const [patient, setPatient] = useState({
   name: "",
   dob: "",
@@ -507,20 +547,20 @@ export default function App() {
     performedBy: "",
     note: DEFAULT_NOTE,
   });
+const [selectedNoteTemplate, setSelectedNoteTemplate] =
+  useState("Default report note");
 
   const [runningNo, setRunningNo] = useState(1);
 const [selectedLab, setSelectedLab] =
-  useState<LabName>("COVID-19 antigen test");
+  useState<LabName>("COVID-19 Antigen Test");
 
-const [labOptions, setLabOptions] = useState<string[]>(() => {
-  const saved = localStorage.getItem("customLabs");
-  const customLabs = saved ? JSON.parse(saved) : [];
-  return [...DEFAULT_LAB_OPTIONS.slice(0, -1), ...customLabs, "Other"];
-});
+const [labOptions, setLabOptions] = useState<string[]>(
+  DEFAULT_LAB_OPTIONS
+);
 
 const [customLabName, setCustomLabName] = useState("");
   const [rows, setRows] = useState<LabRow[]>(
-    makeRowsFromLab("COVID-19 antigen test")
+    makeRowsFromLab("COVID-19 Antigen Test")
   );
   const [selectedNumericLab, setSelectedNumericLab] =
   useState<NumericLabName>("CBC");
@@ -539,7 +579,7 @@ const [authorizedPersons, setAuthorizedPersons] = useState(
 const [newAuthorizedName, setNewAuthorizedName] = useState("");
 const [newAuthorizedPosition, setNewAuthorizedPosition] = useState("");
 
-  const labNo = generateLabNo(testInfo.date, runningNo);
+  const labNo = generateLabNo(testInfo.date, runningNo, deviceCode);
   const age = calculateAge(patient.dob, testInfo.date);
 
   function addSelectedLab() {
@@ -567,14 +607,14 @@ function addNumericLab() {
     ]);
     return;
   }
-  if (selectedNumericLab === "Blood chemistry") {
+  if (selectedNumericLab === "Blood Chemistry") {
   setRows((current) => [
     ...current,
     ...makeBloodChemistryRows(),
   ]);
   return;
 }
-if (selectedNumericLab === "Urine examination") {
+if (selectedNumericLab === "Urine Examination") {
   setRows((current) => [
     ...current,
     ...makeUrineExamRows(),
@@ -715,8 +755,8 @@ function refreshLabNoAndDateTime() {
   passportNo: "",
 });
 
-  setRows(makeRowsFromLab("COVID-19 antigen test"));
-  setSelectedLab("COVID-19 antigen test");
+  setRows(makeRowsFromLab("COVID-19 Antigen Test"));
+  setSelectedLab("COVID-19 Antigen Test");
   setCustomLabName("");
   setDtxResult("");
 setShowDtx(false);
@@ -750,8 +790,8 @@ setShowDtx(false);
 
   setRunningNo((current) => current + 1);
 
-  setRows(makeRowsFromLab("COVID-19 antigen test"));
-  setSelectedLab("COVID-19 antigen test");
+  setRows(makeRowsFromLab("COVID-19 Antigen Test"));
+  setSelectedLab("COVID-19 Antigen Test");
   setCustomLabName("");
 setDtxResult("");
 setShowDtx(false);
@@ -760,7 +800,31 @@ setShowDtx(false);
   setIsApproved(false);
   setApprovedAt("");
 }
+function confirmIfNotApproved() {
+  if (isApproved) return true;
+
+  return window.confirm(
+    "This report has not been approved yet.\n\nDo you still want to continue?"
+  );
+}
+function confirmIfReportTooLong() {
+  const report = document.querySelector(".paper") as HTMLElement;
+  if (!report) return true;
+
+  const paperHeight = report.scrollHeight;
+
+  // ความสูงประมาณ 1 หน้า A4 บน browser
+  const maxA4Height = 1122;
+
+  if (paperHeight <= maxA4Height) return true;
+
+  return window.confirm(
+    "This report may exceed 1 page.\n\nPlease check layout before printing.\n\nDo you still want to print?"
+  );
+}
 async function savePdf() {
+  if (!confirmIfNotApproved()) return;
+
   const report = document.querySelector(".paper") as HTMLElement;
 
   if (!report) return;
@@ -855,9 +919,17 @@ while (renderedHeight < canvas.height) {
           <p>กรอกผลการตรวจทางห้องปฏิบัติการ</p>
         </div>
         <div className="export-buttons">
-  <button className="primary" onClick={() => window.print()}>
-    🖨 Print Report
-  </button>
+  <button
+  className="primary"
+  onClick={() => {
+    if (!confirmIfNotApproved()) return;
+    if (!confirmIfReportTooLong()) return;
+
+    window.print();
+  }}
+>
+  🖨 Print Report
+</button>
 
 <button
   className="pdf-btn"
@@ -875,6 +947,15 @@ while (renderedHeight < canvas.height) {
   >
     WhatsApp
   </button>
+  <button
+  className="line-btn"
+  onClick={() => {
+    alert("Please save PDF first, then attach in LINE.");
+    window.open("https://line.me/", "_blank");
+  }}
+>
+  LINE
+</button>
 </div>
       </header>
 
@@ -886,6 +967,10 @@ while (renderedHeight < canvas.height) {
               Lab No.
               <input value={labNo} readOnly />
             </label>
+            <label>
+  Device Code
+  <input value={deviceCode} readOnly />
+</label>
             <label>
               Running No.
               <input
@@ -1136,12 +1221,12 @@ while (renderedHeight < canvas.height) {
       <option value="Blood Electrolyte">
   Blood Electrolyte
 </option>
-<option value="Blood chemistry">
-  Blood chemistry
+<option value="Blood Chemistry">
+  Blood Chemistry
 </option>
 
-<option value="Urine examination">
-  Urine examination
+<option value="Urine Examination">
+  Urine Examination
 </option>
     </select>
 
@@ -1295,6 +1380,33 @@ while (renderedHeight < canvas.height) {
   </div>
 
   <hr className="section-divider" />
+  <label>
+  Additional note template
+  <select
+    value={selectedNoteTemplate}
+    onChange={(e) => {
+      const selectedLabel = e.target.value;
+      const selectedTemplate = NOTE_TEMPLATES.find(
+        (template) => template.label === selectedLabel
+      );
+
+      setSelectedNoteTemplate(selectedLabel);
+
+      if (selectedTemplate) {
+        setTestInfo({
+          ...testInfo,
+          note: selectedTemplate.text,
+        });
+      }
+    }}
+  >
+    {NOTE_TEMPLATES.map((template) => (
+      <option key={template.label} value={template.label}>
+        {template.label}
+      </option>
+    ))}
+  </select>
+</label>
   <label>
   Additional note
   <textarea

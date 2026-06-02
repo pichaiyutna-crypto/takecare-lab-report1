@@ -745,21 +745,36 @@ function refreshLabNoAndDateTime() {
   setRunningNo((current) => current + 1);
 }
 
-  function clearPatientOnly() {
+ function clearPatientOnly() {
   setPatient({
-  name: "",
-  dob: "",
-  gender: "",
-  nationality: "",
-  hn: "",
-  passportNo: "",
-});
+    name: "",
+    dob: "",
+    gender: "",
+    nationality: "",
+    hn: "",
+    passportNo: "",
+  });
 
   setRows(makeRowsFromLab("COVID-19 Antigen Test"));
   setSelectedLab("COVID-19 Antigen Test");
   setCustomLabName("");
   setDtxResult("");
-setShowDtx(false);
+  setShowDtx(false);
+
+  setIsApproved(false);
+  setApprovedAt("");
+  setAuthorizedBy("");
+  setAuthorizedPosition("");
+
+  refreshLabNoAndDateTime();
+}
+
+function clearLabOnly() {
+  setRows([]);
+  setSelectedLab("COVID-19 Antigen Test");
+  setCustomLabName("");
+  setDtxResult("");
+  setShowDtx(false);
 
   setIsApproved(false);
   setApprovedAt("");
@@ -800,30 +815,70 @@ setShowDtx(false);
   setIsApproved(false);
   setApprovedAt("");
 }
-function confirmIfNotApproved() {
-  if (isApproved) return true;
+
+function confirmBeforeExport() {
+  const warnings: string[] = [];
+
+  if (!patient.name.trim()) {
+    warnings.push("- Patient name is missing.");
+  }
+
+  if (!patient.hn.trim()) {
+    warnings.push("- HN is missing.");
+  }
+
+  if (!testInfo.performedBy.trim()) {
+    warnings.push("- Tested by is missing.");
+  }
+
+  if (!authorizedBy.trim()) {
+    warnings.push("- Authorized by is missing.");
+  }
+
+  if (!isApproved) {
+    warnings.push("- Report has not been approved.");
+  }
+
+  const hasEmptyResult = rows.some((row) => !row.result.trim());
+
+  if (hasEmptyResult) {
+    warnings.push("- Some lab results are still empty.");
+  }
+
+  if (showDtx && !dtxResult.trim()) {
+    warnings.push("- DTX result is missing.");
+  }
+
+  if (warnings.length === 0) return true;
 
   return window.confirm(
-    "This report has not been approved yet.\n\nDo you still want to continue?"
+    "Please review before export:\n\n" +
+      warnings.join("\n") +
+      "\n\nDo you still want to continue?"
   );
 }
-function confirmIfReportTooLong() {
-  const report = document.querySelector(".paper") as HTMLElement;
-  if (!report) return true;
+function confirmIfEndReportNotOnFirstPage() {
+  const paper = document.querySelector(".paper") as HTMLElement;
+  const endReport = document.querySelector(".end-report") as HTMLElement;
 
-  const paperHeight = report.scrollHeight;
+  if (!paper || !endReport) return true;
+
+  const paperTop = paper.getBoundingClientRect().top;
+  const endReportBottom = endReport.getBoundingClientRect().bottom;
+
+  const endReportPosition = endReportBottom - paperTop;
 
   // ความสูงประมาณ 1 หน้า A4 บน browser
-  const maxA4Height = 1122;
+  const firstPageLimit = 1122;
 
-  if (paperHeight <= maxA4Height) return true;
+  if (endReportPosition <= firstPageLimit) return true;
 
   return window.confirm(
-    "This report may exceed 1 page.\n\nPlease check layout before printing.\n\nDo you still want to print?"
+    "The End of Report section may appear on page 2 or later.\n\nPlease check the layout before printing.\n\nDo you still want to print?"
   );
 }
 async function savePdf() {
-  if (!confirmIfNotApproved()) return;
+  if (!confirmBeforeExport()) return;
 
   const report = document.querySelector(".paper") as HTMLElement;
 
@@ -922,11 +977,11 @@ while (renderedHeight < canvas.height) {
   <button
   className="primary"
   onClick={() => {
-    if (!confirmIfNotApproved()) return;
-    if (!confirmIfReportTooLong()) return;
+  if (!confirmBeforeExport()) return;
+  if (!confirmIfEndReportNotOnFirstPage()) return;
 
-    window.print();
-  }}
+  window.print();
+}}
 >
   🖨 Print Report
 </button>
@@ -1508,13 +1563,18 @@ while (renderedHeight < canvas.height) {
 </div>
 
           <div className="button-row">
-            <button className="primary" onClick={clearPatientOnly}>
-              Clear Patient Only
-            </button>
-            <button className="danger" onClick={resetAll}>
-              Reset All
-            </button>
-          </div>
+  <button className="primary" onClick={clearPatientOnly}>
+    Clear Patient Only
+  </button>
+
+  <button className="warning" onClick={clearLabOnly}>
+    Clear Lab Only
+  </button>
+
+  <button className="danger" onClick={resetAll}>
+    Reset All
+  </button>
+</div>
         </section>
    
         

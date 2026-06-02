@@ -1015,3 +1015,12 @@ button {
 .line-btn:hover {
   opacity: 0.9;
 }
+
+.warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.warning:hover {
+  background: #d97706;
+}

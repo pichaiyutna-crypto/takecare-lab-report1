@@ -38,7 +38,33 @@ type LabName =
   | "Blood Chemistry"
   | "Urine Examination";
 
-
+type SavedReport = {
+  id: string;
+  savedAt: string;
+  labNo: string;
+  patient: {
+    name: string;
+    dob: string;
+    gender: string;
+    nationality: string;
+    hn: string;
+    passportNo: string;
+  };
+  testInfo: {
+    date: string;
+    time: string;
+    performedBy: string;
+    note: string;
+  };
+  runningNo: number;
+  rows: LabRow[];
+  dtxResult: string;
+  showDtx: boolean;
+  authorizedBy: string;
+  authorizedPosition: string;
+  isApproved: boolean;
+  approvedAt: string;
+};
 
 const DEFAULT_LAB_OPTIONS = [
   "COVID-19 Antigen Test",
@@ -578,7 +604,11 @@ const [authorizedPersons, setAuthorizedPersons] = useState(
 );
 const [newAuthorizedName, setNewAuthorizedName] = useState("");
 const [newAuthorizedPosition, setNewAuthorizedPosition] = useState("");
-
+const [showHelp, setShowHelp] = useState(false);
+const [savedReports, setSavedReports] = useState<SavedReport[]>(() => {
+  const saved = localStorage.getItem("savedReports");
+  return saved ? JSON.parse(saved) : [];
+});
   const labNo = generateLabNo(testInfo.date, runningNo, deviceCode);
   const age = calculateAge(patient.dob, testInfo.date);
 
@@ -815,6 +845,50 @@ setShowDtx(false);
   setIsApproved(false);
   setApprovedAt("");
 }
+function saveRecord() {
+  const record: SavedReport = {
+    id: newId(),
+    savedAt: new Date().toLocaleString(),
+    labNo,
+    patient,
+    testInfo,
+    runningNo,
+    rows,
+    dtxResult,
+    showDtx,
+    authorizedBy,
+    authorizedPosition,
+    isApproved,
+    approvedAt,
+  };
+
+  const updated = [record, ...savedReports];
+
+  setSavedReports(updated);
+  localStorage.setItem("savedReports", JSON.stringify(updated));
+
+  alert("Record saved successfully.");
+}
+
+function loadRecord(record: SavedReport) {
+  setPatient(record.patient);
+  setTestInfo(record.testInfo);
+  setRunningNo(record.runningNo);
+  setRows(record.rows);
+  setDtxResult(record.dtxResult);
+  setShowDtx(record.showDtx);
+  setAuthorizedBy(record.authorizedBy);
+  setAuthorizedPosition(record.authorizedPosition);
+  setIsApproved(record.isApproved);
+  setApprovedAt(record.approvedAt);
+}
+
+function deleteRecord(id: string) {
+  const updated = savedReports.filter((record) => record.id !== id);
+
+  setSavedReports(updated);
+  localStorage.setItem("savedReports", JSON.stringify(updated));
+}
 
 function confirmBeforeExport() {
   const warnings: string[] = [];
@@ -967,6 +1041,87 @@ while (renderedHeight < canvas.height) {
 }
   return (
     <div className="app">
+      {showHelp && (
+  <div className="help-overlay">
+    <div className="help-modal">
+<h2>คู่มือการใช้งาน Lab Report Builder</h2>
+
+<p>
+<b>1. เริ่มต้นกรอกข้อมูลผู้ป่วย</b><br />
+กรอกชื่อ-นามสกุล วันเดือนปีเกิด เพศ สัญชาติ
+Passport No. และ HN ให้ครบถ้วน
+</p>
+
+<p>
+<b>2. เพิ่มรายการตรวจ</b><br />
+เลือก Rapid Test หรือ Numeric Lab
+จากนั้นกด Add เพื่อเพิ่มรายการตรวจ
+</p>
+
+<p>
+<b>3. กรอกผลตรวจ</b><br />
+Rapid Test เลือก Positive หรือ Negative<br />
+CBC / DTX / Blood Chemistry / Electrolyte
+ให้กรอกค่าตัวเลขตามผลตรวจ
+</p>
+
+<p>
+<b>4. ตรวจสอบข้อมูลก่อนออกผล</b><br />
+ตรวจสอบชื่อผู้ป่วย เลข HN
+รายการตรวจ และผลตรวจให้ถูกต้อง
+</p>
+
+<p>
+<b>5. ระบุผู้ตรวจและผู้รับรองผล</b><br />
+เลือก Tested by และ Authorized by
+ก่อนพิมพ์รายงาน
+</p>
+
+<p>
+<b>6. อนุมัติรายงาน</b><br />
+กด Approve Report เพื่อบันทึกการรับรองผล
+ก่อนพิมพ์หรือบันทึก PDF
+</p>
+
+<p>
+<b>7. พิมพ์หรือบันทึก PDF</b><br />
+Print Report = พิมพ์รายงาน<br />
+Save PDF = บันทึกเป็นไฟล์ PDF
+</p>
+
+<p>
+<b>8. ความหมายของปุ่มล้างข้อมูล</b><br />
+Clear Patient Only = ล้างข้อมูลผู้ป่วยและเริ่ม Lab No. ใหม่<br />
+Clear Lab Only = ล้างเฉพาะผลตรวจ แต่เก็บข้อมูลผู้ป่วยไว้<br />
+Reset All = ล้างข้อมูลทั้งหมด
+</p>
+
+<p>
+<b>9. บันทึกประวัติ</b><br />
+Save Record = บันทึกข้อมูลไว้ในเครื่อง<br />
+Load = เรียกข้อมูลเดิมกลับมาใช้งาน<br />
+Delete = ลบข้อมูลที่บันทึกไว้
+</p>
+
+<p>
+<b>10. หมายเหตุ</b><br />
+หากผลตรวจเป็นสีแดง
+แสดงว่าค่าดังกล่าวอยู่นอกช่วงอ้างอิง (Reference Range)
+ควรตรวจสอบอีกครั้งก่อนออกผล
+</p>
+
+<button
+  className="danger"
+  onClick={() => setShowHelp(false)}
+>
+  ปิดคู่มือ
+</button>
+      
+      
+
+    </div>
+  </div>
+)}
       <header className="topbar no-print">
         <TakeCareLogo />
         <div className="top-title">
@@ -974,21 +1129,31 @@ while (renderedHeight < canvas.height) {
           <p>กรอกผลการตรวจทางห้องปฏิบัติการ</p>
         </div>
         <div className="export-buttons">
+         <button
+  className="help-btn"
+  onClick={() => setShowHelp(true)}
+  title="เปิดคู่มือการใช้งานภาษาไทย"
+>
+  Help
+</button>
+
   <button
   className="primary"
+  title="พิมพ์รายงาน ตรวจสอบข้อมูลก่อนพิมพ์ทุกครั้ง"
   onClick={() => {
   if (!confirmBeforeExport()) return;
   if (!confirmIfEndReportNotOnFirstPage()) return;
-
   window.print();
 }}
 >
   🖨 Print Report
+  
 </button>
 
 <button
   className="pdf-btn"
   onClick={savePdf}
+  title="บันทึกรายงานเป็นไฟล์ PDF"
 >
   📄 Save PDF
 </button>
@@ -1057,6 +1222,7 @@ while (renderedHeight < canvas.height) {
                 <input
                   type="date"
                   value={patient.dob}
+                  title="เลือกวันเดือนปีเกิด ระบบจะคำนวณอายุให้อัตโนมัติ"
                   onChange={(e) =>
                     setPatient({ ...patient, dob: e.target.value })
                   }
@@ -1071,6 +1237,7 @@ while (renderedHeight < canvas.height) {
   <label>
     Gender
     <select
+    title="เลือกเพศของผู้ป่วย"
       value={patient.gender}
       onChange={(e) =>
         setPatient({
@@ -1096,6 +1263,7 @@ while (renderedHeight < canvas.height) {
                     setPatient({ ...patient, nationality: e.target.value })
                   }
                   placeholder="British"
+                  title="กรอกสัญชาติของผู้ป่วย เช่น Thai, British, German"
                 />
               </label>
               <label>
@@ -1106,6 +1274,7 @@ while (renderedHeight < canvas.height) {
                     setPatient({ ...patient, passportNo: e.target.value })
                   }
                   placeholder="AB1234567"
+                  title="กรอกหมายเลข Passport ของผู้ป่วย"
                 />
               </label>
             </div>
@@ -1113,10 +1282,11 @@ while (renderedHeight < canvas.height) {
             <label>
               HN
               <input
-                value={patient.hn}
-                onChange={(e) => setPatient({ ...patient, hn: e.target.value })}
-                placeholder="HN-000123"
-              />
+  value={patient.hn}
+  onChange={(e) => setPatient({ ...patient, hn: e.target.value })}
+  placeholder="HN-000123"
+  title="กรอกเลข HN หรือเลขประจำตัวผู้ป่วยของคลินิก"
+/>
             </label>
           </div>
 
@@ -1125,7 +1295,8 @@ while (renderedHeight < canvas.height) {
 
             <div className="row">
               <select
-                value={selectedLab}
+  value={selectedLab}
+  title="เลือกชนิดการตรวจแบบ Positive / Negative แล้วกด Add"
                 onChange={(e) => setSelectedLab(e.target.value as LabName)}
               >
                 {labOptions.map((lab) => (
@@ -1134,7 +1305,11 @@ while (renderedHeight < canvas.height) {
                   </option>
                 ))}
               </select>
-              <button className="primary small-btn" onClick={addSelectedLab}>
+              <button
+  className="primary small-btn"
+  onClick={addSelectedLab}
+  title="เพิ่มรายการตรวจที่เลือกเข้าสู่รายงาน"
+>
                 Add
               </button>
             </div>
@@ -1221,6 +1396,7 @@ while (renderedHeight < canvas.height) {
             : "mini-neg"
         }
         onClick={() => setResult(row.id, "Negative")}
+        title="กดเมื่อผลตรวจเป็นลบ"
       >
         Negative
       </button>
@@ -1232,15 +1408,20 @@ while (renderedHeight < canvas.height) {
             : "mini-pos"
         }
         onClick={() => setResult(row.id, "Positive")}
+        title="กดเมื่อผลตรวจเป็นบวก"
       >
         Positive
       </button>
     </>
   )}
 
-  <button className="delete" onClick={() => removeRow(row.id)}>
-    ×
-  </button>
+  <button
+  className="delete"
+  onClick={() => removeRow(row.id)}
+  title="ลบรายการตรวจนี้ออกจากรายงาน"
+>
+  ×
+</button>
 </div>
 
                 </div>
@@ -1267,6 +1448,7 @@ while (renderedHeight < canvas.height) {
   <div className="row">
     <select
       value={selectedNumericLab}
+      title="เลือกกลุ่ม Lab ที่ต้องกรอกเป็นตัวเลข"
       onChange={(e) =>
         setSelectedNumericLab(e.target.value as NumericLabName)
       }
@@ -1289,6 +1471,7 @@ while (renderedHeight < canvas.height) {
       type="button"
       className="primary small-btn"
       onClick={addNumericLab}
+      title="เพิ่มกลุ่ม Lab ตัวเลขเข้าไปในรายงาน"
     >
       Add
     </button>
@@ -1325,6 +1508,7 @@ while (renderedHeight < canvas.height) {
     value={row.result}
     onChange={(e) => setNumericResult(row.id, e.target.value)}
     placeholder="Result"
+    title="กรอกค่าผลตรวจเป็นตัวเลข ระบบจะแสดงสีแดงหากอยู่นอกช่วงอ้างอิง"
     className={getNumericFlag(row) ? "abnormal-input" : ""}
   />
 )}
@@ -1351,6 +1535,7 @@ while (renderedHeight < canvas.height) {
           value={dtxResult}
           onChange={(e) => setDtxResult(e.target.value)}
           placeholder="Enter DTX result"
+          title="กรอกค่า DTX เป็นตัวเลข หน่วย mg/dL"
           className={isDtxAbnormal(dtxResult) ? "abnormal-input" : ""}
         />
       </label>
@@ -1362,12 +1547,13 @@ while (renderedHeight < canvas.height) {
   )}
 
   <button
-    type="button"
-    className="danger small-btn"
-    onClick={clearNumericLab}
-  >
-    Clear Numeric Lab
-  </button>
+  type="button"
+  className="danger small-btn"
+  onClick={clearNumericLab}
+  title="ล้างเฉพาะ Lab ที่เป็นตัวเลข เช่น CBC, DTX, Blood Chemistry, Urine"
+>
+  Clear Numeric Lab
+</button>
 </div>
 
 <div className="card">
@@ -1379,6 +1565,7 @@ while (renderedHeight < canvas.height) {
       <input
         type="date"
         value={testInfo.date}
+        title="วันที่ตรวจ ใช้แสดงในรายงาน"
         onChange={(e) =>
           setTestInfo({
             ...testInfo,
@@ -1393,6 +1580,7 @@ while (renderedHeight < canvas.height) {
       <input
         type="time"
         value={testInfo.time}
+        title="เวลาที่ตรวจ ใช้แสดงในรายงาน"
         onChange={(e) =>
           setTestInfo({
             ...testInfo,
@@ -1407,6 +1595,7 @@ while (renderedHeight < canvas.height) {
     Tested by
     <select
       value={testInfo.performedBy}
+      title="เลือกชื่อผู้ตรวจหรือผู้ทำการตรวจ"
       onChange={(e) =>
         setTestInfo({
           ...testInfo,
@@ -1428,6 +1617,7 @@ while (renderedHeight < canvas.height) {
       value={newPerformer}
       onChange={(e) => setNewPerformer(e.target.value)}
       placeholder="Add new tester"
+      title="พิมพ์ชื่อผู้ตรวจใหม่ หากไม่มีในรายการ"
     />
     <button className="green small-btn" onClick={addPerformer}>
       Add
@@ -1439,6 +1629,7 @@ while (renderedHeight < canvas.height) {
   Additional note template
   <select
     value={selectedNoteTemplate}
+    title="เลือกข้อความหมายเหตุสำเร็จรูป"
     onChange={(e) => {
       const selectedLabel = e.target.value;
       const selectedTemplate = NOTE_TEMPLATES.find(
@@ -1474,12 +1665,14 @@ while (renderedHeight < canvas.height) {
       })
     }
     placeholder="Example: Hemolysis noted. Please interpret potassium result with caution."
+    title="พิมพ์หมายเหตุเพิ่มเติม เช่น ตัวอย่างเลือด hemolysis หรือคำแนะนำการแปลผล"
   />
 </label>
   <label>
     Authorized by
     <select
       value={authorizedBy}
+      title="เลือกผู้รับรองผลตรวจ"
       onChange={(e) => {
         const selectedName = e.target.value;
         const selected = authorizedPersons.find(
@@ -1503,7 +1696,11 @@ while (renderedHeight < canvas.height) {
 
   <label>
     Position
-    <input value={authorizedPosition} readOnly />
+    <input
+  value={authorizedPosition}
+  readOnly
+  title="ตำแหน่งของผู้รับรองผล ระบบจะแสดงอัตโนมัติ"
+/>
   </label>
 
   <div className="row">
@@ -1511,12 +1708,14 @@ while (renderedHeight < canvas.height) {
     value={newAuthorizedName}
     onChange={(e) => setNewAuthorizedName(e.target.value)}
     placeholder="Add authorized name"
+    title="เพิ่มชื่อผู้รับรองผล หากไม่มีในรายการ"
   />
 
   <input
     value={newAuthorizedPosition}
     onChange={(e) => setNewAuthorizedPosition(e.target.value)}
     placeholder="Position"
+    title="กรอกตำแหน่งของผู้รับรองผล เช่น Physician, Nurse"
   />
 
   <button
@@ -1546,30 +1745,86 @@ while (renderedHeight < canvas.height) {
 </div>
 
   <button
-    type="button"
-    className={isApproved ? "approved-btn active" : "approved-btn"}
-    onClick={() => {
-      if (!authorizedBy.trim()) {
-        alert("Please select Authorized by first.");
-        return;
-      }
+  type="button"
+  className={isApproved ? "approved-btn active" : "approved-btn"}
+  title="กดเพื่อรับรองผลตรวจก่อนพิมพ์หรือบันทึก PDF"
+  onClick={() => {
+    if (!authorizedBy.trim()) {
+      alert("Please select Authorized by first.");
+      return;
+    }
 
-      setIsApproved(true);
-      setApprovedAt(new Date().toLocaleString());
-    }}
-  >
-    {isApproved ? "Digitally Approved" : "Approve Report"}
-  </button>
+    setIsApproved(true);
+    setApprovedAt(new Date().toLocaleString());
+  }}
+>
+  {isApproved ? "Digitally Approved" : "Approve Report"}
+</button>
 </div>
 
           <div className="button-row">
-  <button className="primary" onClick={clearPatientOnly}>
+            <div className="card">
+  <h2>Saved History</h2>
+
+  {savedReports.length === 0 ? (
+    <p className="small-note">No saved records.</p>
+  ) : (
+    <div className="mini-table">
+      {savedReports.map((record) => (
+        <div className="mini-row" key={record.id}>
+          <div>
+            <b>{record.patient.name || "Unknown Patient"}</b>
+            <br />
+            <span>{record.labNo}</span>
+            <br />
+            <span>{record.savedAt}</span>
+          </div>
+
+          <div className="mini-actions">
+            <button
+              className="primary small-btn"
+              onClick={() => loadRecord(record)}
+            >
+              Load
+              title="ดึงข้อมูลรายงานนี้กลับมาแก้ไขหรือพิมพ์ใหม่"
+            </button>
+
+            <button
+              className="delete"
+              onClick={() => deleteRecord(record.id)}
+            >
+              ×
+              title="ลบประวัติรายงานนี้ออกจากเครื่อง"
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+  <button
+  className="primary"
+  onClick={clearPatientOnly}
+  title="ล้างข้อมูลผู้ป่วยและผลตรวจ พร้อมสร้าง Lab No. ใหม่"
+>
     Clear Patient Only
   </button>
 
-  <button className="warning" onClick={clearLabOnly}>
+  <button
+  className="warning"
+  onClick={clearLabOnly}
+  title="ล้างเฉพาะผลตรวจ แต่เก็บข้อมูลผู้ป่วยไว้"
+>
     Clear Lab Only
   </button>
+
+<button
+  className="green"
+  onClick={saveRecord}
+  title="บันทึกข้อมูลรายงานนี้ไว้ในเครื่อง"
+>
+  Save Record
+</button>
 
   <button className="danger" onClick={resetAll}>
     Reset All

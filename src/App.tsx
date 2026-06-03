@@ -1732,3 +1732,4 @@ while (renderedHeight < canvas.height) {
   </div>
 );
 }
+

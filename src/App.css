@@ -1074,3 +1074,38 @@ button {
     min-height: 1123px;
   }
 }
+
+.report-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.paper {
+  width: 794px !important;
+  min-width: 794px !important;
+  max-width: 794px !important;
+  min-height: 1123px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .workspace {
+    display: block;
+  }
+
+  .controls {
+    width: 100%;
+  }
+
+  .report-scroll {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .paper {
+    width: 794px !important;
+    min-width: 794px !important;
+    max-width: 794px !important;
+    transform: none !important;
+  }
+}

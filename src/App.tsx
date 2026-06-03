@@ -1578,7 +1578,8 @@ while (renderedHeight < canvas.height) {
         </section>
    
         
-        <section className="paper">
+        <section className="report-scroll">
+  <section className="paper">
           <div className="watermark">
             <TakeCareStamp />
           </div>
@@ -1726,7 +1727,8 @@ while (renderedHeight < canvas.height) {
 
           <div className="end-report">*** End of Report ***</div>
         </section>
-      </main>
-    </div>
-  );
+      </section>
+    </main>
+  </div>
+);
 }

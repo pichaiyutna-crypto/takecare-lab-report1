@@ -1024,3 +1024,53 @@ button {
 .warning:hover {
   background: #d97706;
 }
+
+.report-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.paper {
+  width: 794px;
+  min-height: 1123px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .workspace {
+    display: block;
+  }
+
+  .controls {
+    width: 100%;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    width: 100%;
+  }
+
+  .report-scroll {
+    overflow-x: auto;
+    padding-bottom: 16px;
+  }
+
+  .paper {
+    width: 794px;
+    min-height: 1123px;
+  }
+}

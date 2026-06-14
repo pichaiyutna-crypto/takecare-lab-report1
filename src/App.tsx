@@ -956,13 +956,25 @@ async function savePdf() {
 
   const report = document.querySelector(".paper") as HTMLElement;
 
-  if (!report) return;
+if (!report) return;
 
-  const canvas = await html2canvas(report, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-  });
+const watermark = report.querySelector(".watermark") as HTMLElement;
+
+// ซ่อนลายน้ำชั่วคราว
+if (watermark) {
+  watermark.style.display = "none";
+}
+
+const canvas = await html2canvas(report, {
+  scale: 2,
+  useCORS: true,
+  backgroundColor: "#ffffff",
+});
+
+// แสดงลายน้ำกลับ
+if (watermark) {
+  watermark.style.display = "";
+}
 
  
 const pdf = new jsPDF("p", "mm", "a4");
@@ -1782,20 +1794,20 @@ Delete = ลบข้อมูลที่บันทึกไว้
 
           <div className="mini-actions">
             <button
-              className="primary small-btn"
-              onClick={() => loadRecord(record)}
-            >
-              Load
-              title="ดึงข้อมูลรายงานนี้กลับมาแก้ไขหรือพิมพ์ใหม่"
-            </button>
+  className="primary small-btn"
+  onClick={() => loadRecord(record)}
+  title="ดึงข้อมูลรายงานนี้กลับมาแก้ไขหรือพิมพ์ใหม่"
+>
+  Load
+</button>
 
             <button
-              className="delete"
-              onClick={() => deleteRecord(record.id)}
-            >
-              ×
-              title="ลบประวัติรายงานนี้ออกจากเครื่อง"
-            </button>
+  className="delete"
+  onClick={() => deleteRecord(record.id)}
+  title="ลบประวัติรายงานนี้ออกจากเครื่อง"
+>
+  ×
+</button>
           </div>
         </div>
       ))}

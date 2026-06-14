@@ -1139,3 +1139,14 @@ button {
 
   border-radius: 12px;
 }
+
+@media print {
+  .watermark {
+    display: none !important;
+  }
+}
+watermark.style.display = "none";
+...
+html2canvas(...)
+...
+watermark.style.display = "";
